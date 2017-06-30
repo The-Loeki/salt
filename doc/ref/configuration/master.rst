@@ -190,9 +190,6 @@ This path is appended to :conf_master:`root_dir`.
 
     extension_modules: /root/salt_extmods
 
-.. conf_master:: extmod_whitelist
-.. conf_master:: extmod_blacklist
-
 ``extmod_whitelist/extmod_blacklist``
 -------------------------------------
 
