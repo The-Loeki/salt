@@ -676,6 +676,11 @@ Additional Features
 
       ret1 = __salt__['salt.execute']('*', 'mod.fun')
 
+- The ``state_output`` parameter now supports
+  ``full_id``, ``changes_id`` and ``terse_id``
+  Just like ``mixed_id``, these use the state ID as name
+  in the highstate output
+
 New Modules
 ===========
 
