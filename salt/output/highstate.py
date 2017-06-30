@@ -248,7 +248,7 @@ def _format_host(host, data):
 
             state_output = __opts__.get('state_output', 'full').lower()
             comps = [sdecode(comp) for comp in tname.split('_|-')]
-            if __opts__['state_output'].endswith('id'):
+            if state_output.endswith('id'):
                 # Swap in the ID for the name. Refs #35137
                 comps[2] = comps[1]
 

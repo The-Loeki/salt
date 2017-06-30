@@ -2023,6 +2023,8 @@ output for states that failed or states that have changes.
 ``state_output``
 ----------------
 
+Default: ``full``
+
 The state_output setting controls which results will be output full multi line:
 
 * ``full``, ``terse`` - each state will be full/terse
