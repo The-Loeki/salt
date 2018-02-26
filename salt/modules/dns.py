@@ -248,6 +248,22 @@ def NS(domain, resolve=False, **kwargs):
         return _resolve(res, **kwargs)
 
 
+def PTR(ip, **kwargs):
+    '''
+    Return the pointer for an IP address.
+
+    If raw=True you must provide the actual record name, e.g. 1.168.192.in-addr.arpa
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt ns1 dns.PTR 104.197.168.128 resolve=True
+
+    '''
+    return lookup(ip, 'PTR', **kwargs)
+
+
 def SOA(domain, **kwargs):
     '''
     Return the DNS authority record for the domain.
@@ -279,7 +295,6 @@ def SPF(domain, **kwargs):
             'Please use \'servers\' instead.'
         )
         kwargs['servers'] = kwargs.pop('nameserver')
-
     return lookup(domain, 'SPF', **kwargs)
 
 
@@ -308,8 +323,6 @@ def TLSA(service, **kwargs):
     Return DNS-authorized certificates for a service
 
     '''
-
-
     return lookup(service, 'TLSA', **kwargs)
 
 
@@ -340,6 +353,7 @@ aaaa = AAAA
 caa = CAA
 mx = MX
 ns = NS
+ptr = PTR
 spf = SPF
 sshfp = SSHFP
 soa = SOA
