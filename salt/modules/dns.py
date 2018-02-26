@@ -7,6 +7,17 @@ dig
 dnsutil
 
 
+# Lookup/query stuff
+        'A':    a_rec,
+        'AAAA': aaaa_rec,
+        'CAA':  caa_rec,
+        'MX':   mx_rec,
+        'SOA':  soa_rec,
+        'SPF':  spf_rec,
+        'SRV':  srv_rec,
+
+lookup()
+
 # Local stuff to resolv.py
 resolv()
 resolv_dostuff()
@@ -109,6 +120,15 @@ def A(host, **kwargs):
         salt ns1 dns.AAAA saltstack.com
 
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(host, 'A', **kwargs)
 
 
@@ -122,6 +142,15 @@ def AAAA(host, **kwargs):
         salt ns1 dns.AAAA saltstack.com
 
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(host, 'AAAA', **kwargs)
 
 
@@ -148,6 +177,15 @@ def MX(domain, **kwargs):
 
         salt ns1 dns.MX saltstack.com
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(domain, 'NS', **kwargs)
 
 
@@ -161,6 +199,15 @@ def NS(domain, **kwargs):
 
         salt ns1 dns.SOA saltstack.com
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(domain, 'NS', **kwargs)
 
 
@@ -188,6 +235,15 @@ def SPF(domain, **kwargs):
 
         salt ns1 dns.SPF saltstack.com
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(domain, 'SPF', **kwargs)
 
 
@@ -231,6 +287,15 @@ def TXT(name, **kwargs):
 
         salt ns1 dns.TXT saltstack.com
     '''
+    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
     return lookup(name, 'TXT', **kwargs)
 
 
