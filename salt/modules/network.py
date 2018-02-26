@@ -1877,3 +1877,19 @@ def iphexval(ip):
     a = ip.split('.')
     hexval = ['%02X' % int(x) for x in a]  # pylint: disable=E1321
     return ''.join(hexval)
+
+
+def is_ip(ip):
+    '''
+    Check if address is a valid IP. returns True if valid, otherwise False.
+
+    .. versionadded:: Fluorine
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt ns1 network.is_ip 127.0.0.1
+        salt ns1 network.is_ip 1111:2222:3333:4444:5555:6666:7777:8888
+    '''
+    return salt.utils.validate.net.ipv4_addr(ip) or salt.utils.validate.net.ipv6_addr(ip)
