@@ -1,30 +1,12 @@
 # -*- coding: utf-8 -*-
 '''
-DNS utilitiese
-
-Replace:
-dig
-dnsutil
-
-
-# Lookup/query stuff
-        'A':    a_rec,
-        'AAAA': aaaa_rec,
-        'CAA':  caa_rec,
-        'MX':   mx_rec,
-        'SOA':  soa_rec,
-        'SPF':  spf_rec,
-        'SRV':  srv_rec,
-
-lookup()
+Compendium of DNS utilitiese
 
 # Local stuff to resolv.py
 resolv()
 resolv_dostuff()
 hosts()
 hosts_dostuff()
-
-# Cloud
 
 
 '''
@@ -89,8 +71,8 @@ def lookup(
     .. code-block:: bash
 
         salt ns1 dns.lookup www.saltstack.com AAAA
-        salt ns1 dns.lookup saltstack.com SPF raw=True resolver=dig
-        salt ns1 dns.lookup repo.saltstack.com nameservers='[ 8.8.8.8, 8.8.4.4 ]' timeout=8
+        salt ns1 dns.lookup saltstack.com SPF raw=True
+        salt ns1 dns.lookup repo.saltstack.com servers='[ 8.8.8.8, 8.8.4.4 ]' timeout=8
         salt ns1 dns.lookup wpad rdtype=AAAA walk=True
     '''
     if raw:
@@ -110,15 +92,33 @@ def lookup(
     return res
 
 
+def host(name, ip6=True, ip4=True, **kwargs):
+    '''
+    Return a list of addresses for name
+
+    ip6:
+        Include list of IPv6 addresses
+    ip4:
+        Include list of IPv4 addresses
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt ns1 dns.host saltstack.com
+    '''
+    return salt.utils.dns.host(name, ip6, ip4, **kwargs)
+
+
 def A(host, **kwargs):
     '''
     Return the IPv4 addresses of a host
+
     CLI Example:
 
     .. code-block:: bash
 
         salt ns1 dns.AAAA saltstack.com
-
     '''
     # Deprecation warning for the nameserver option
     if 'nameserver' in kwargs:
