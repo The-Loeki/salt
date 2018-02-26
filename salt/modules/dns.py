@@ -15,10 +15,12 @@ hosts_dostuff()
 
 # Salt libs
 import salt.utils.dns
+import salt.utils.validate.net
 
 # logging & debugging
 import logging
 import pprint
+
 ppr = pprint.PrettyPrinter(indent=2).pprint
 
 log = logging.getLogger(__name__)
@@ -26,6 +28,17 @@ log = logging.getLogger(__name__)
 
 def __virtual__():
     return True
+
+
+def _resolve(host, **kwargs):
+    res = {}
+    if salt.utils.validate.net.ipv4_addr(host):
+        res['ip4'] = [host]
+    elif salt.utils.validate.net.ipv6_addr(host):
+        res['ip6'] = [host]
+    else:
+        res = host(host, **kwargs)
+    return res
 
 
 def lookup(
@@ -167,9 +180,12 @@ def CAA(domain, **kwargs):
     return lookup(domain, 'CAA', **kwargs)
 
 
-def MX(domain, **kwargs):
+def MX(domain, resolve=True, **kwargs):
     '''
     Return the mail transfer agents of the domain
+
+    resolve:
+        Resolve the names of the agents to IP addresses
 
     CLI Example:
 
@@ -186,7 +202,22 @@ def MX(domain, **kwargs):
         )
         kwargs['servers'] = kwargs.pop('nameserver')
 
-    return lookup(domain, 'NS', **kwargs)
+    res = lookup(domain, 'NS', **kwargs)
+
+    if not resolve or not res:
+        return res
+
+    for pref, agents in res.items():
+        pref_addrs = {
+            'ip6': [],
+            'ip4': []
+        }
+        for agent in agents:
+            for fam, addrs in _resolve(agent).items():
+                pref_addrs[fam].extend(addrs)
+        res[pref] = pref_addrs
+
+    return res
 
 
 def NS(domain, **kwargs):
