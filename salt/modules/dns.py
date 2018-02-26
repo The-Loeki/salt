@@ -31,14 +31,24 @@ def __virtual__():
 
 
 def _resolve(host, **kwargs):
-    res = {}
-    if salt.utils.validate.net.ipv4_addr(host):
-        res['ip4'] = [host]
-    elif salt.utils.validate.net.ipv6_addr(host):
-        res['ip6'] = [host]
+    if isinstance(host, (list, tuple)):
+        res = {}
+        for h in host:
+            hres = _resolve(h, **kwargs)
+            if not hres:
+                continue
+            for k, v in hres.items():
+                res[k] = res.get(k, []).extend(v)
+        return res
     else:
-        res = host(host, **kwargs)
-    return res
+        res = {}
+        if salt.utils.validate.net.ipv4_addr(host):
+            res['ip4'] = [host]
+        elif salt.utils.validate.net.ipv6_addr(host):
+            res['ip6'] = [host]
+        else:
+            res = host(host, **kwargs)
+        return res
 
 
 def lookup(
@@ -85,7 +95,7 @@ def lookup(
 
         salt ns1 dns.lookup www.saltstack.com AAAA
         salt ns1 dns.lookup saltstack.com SPF raw=True
-        salt ns1 dns.lookup repo.saltstack.com servers='[ 8.8.8.8, 8.8.4.4 ]' timeout=8
+        salt ns1 dns.lookup repo.saltstack.com timeout=8
         salt ns1 dns.lookup wpad rdtype=AAAA walk=True
     '''
     if raw:
@@ -109,9 +119,9 @@ def host(name, ip6=True, ip4=True, **kwargs):
     '''
     Return a list of addresses for name
 
-    ip6:
+    :param ip6:
         Include list of IPv6 addresses
-    ip4:
+    :param ip4:
         Include list of IPv4 addresses
 
     CLI Example:
@@ -131,9 +141,8 @@ def A(host, **kwargs):
 
     .. code-block:: bash
 
-        salt ns1 dns.AAAA saltstack.com
+        salt ns1 dns.A saltstack.com
     '''
-    # Deprecation warning for the nameserver option
     if 'nameserver' in kwargs:
         salt.utils.versions.warn_until(
             'Natrium',
@@ -155,7 +164,6 @@ def AAAA(host, **kwargs):
         salt ns1 dns.AAAA saltstack.com
 
     '''
-    # Deprecation warning for the nameserver option
     if 'nameserver' in kwargs:
         salt.utils.versions.warn_until(
             'Natrium',
@@ -180,11 +188,11 @@ def CAA(domain, **kwargs):
     return lookup(domain, 'CAA', **kwargs)
 
 
-def MX(domain, resolve=True, **kwargs):
+def MX(domain, resolve=False, **kwargs):
     '''
     Return the mail transfer agents of the domain
 
-    resolve:
+    :param resolve:
         Resolve the names of the agents to IP addresses
 
     CLI Example:
@@ -193,7 +201,38 @@ def MX(domain, resolve=True, **kwargs):
 
         salt ns1 dns.MX saltstack.com
     '''
-    # Deprecation warning for the nameserver option
+    if 'nameserver' in kwargs:
+        salt.utils.versions.warn_until(
+            'Natrium',
+            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
+            'Please use \'servers\' instead.'
+        )
+        kwargs['servers'] = kwargs.pop('nameserver')
+
+    res = lookup(domain, 'MX', **kwargs)
+
+    if not resolve or not res:
+        return res
+
+    for pref, agents in res.items():
+        res[pref] = _resolve(agents, **kwargs)
+
+    return res
+
+
+def NS(domain, resolve=False, **kwargs):
+    '''
+    Return the nameservers for the domain.
+
+    :param resolve:
+        Resolve names of the servers to IP addresses
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt ns1 dns.NS saltstack.com resolve=True
+    '''
     if 'nameserver' in kwargs:
         salt.utils.versions.warn_until(
             'Natrium',
@@ -203,43 +242,10 @@ def MX(domain, resolve=True, **kwargs):
         kwargs['servers'] = kwargs.pop('nameserver')
 
     res = lookup(domain, 'NS', **kwargs)
-
     if not resolve or not res:
         return res
-
-    for pref, agents in res.items():
-        pref_addrs = {
-            'ip6': [],
-            'ip4': []
-        }
-        for agent in agents:
-            for fam, addrs in _resolve(agent).items():
-                pref_addrs[fam].extend(addrs)
-        res[pref] = pref_addrs
-
-    return res
-
-
-def NS(domain, **kwargs):
-    '''
-    Return the nameservers for the domain.
-
-    CLI Example:
-
-    .. code-block:: bash
-
-        salt ns1 dns.SOA saltstack.com
-    '''
-    # Deprecation warning for the nameserver option
-    if 'nameserver' in kwargs:
-        salt.utils.versions.warn_until(
-            'Natrium',
-            'The \'nameserver\' argument has been deprecated and will be removed in Salt {version}.'
-            'Please use \'servers\' instead.'
-        )
-        kwargs['servers'] = kwargs.pop('nameserver')
-
-    return lookup(domain, 'NS', **kwargs)
+    else:
+        return _resolve(res, **kwargs)
 
 
 def SOA(domain, **kwargs):
@@ -258,7 +264,7 @@ def SOA(domain, **kwargs):
 def SPF(domain, **kwargs):
     '''
     Return the authorized mail senders for the domain.
-    The SPF record is deprecated, so unless raw=True, SPF data in TXT records will be looked up as well
+    The SPF record is deprecated, so unless raw=True, SPF data in TXT records will be looked up first
 
     CLI Example:
 
@@ -266,7 +272,6 @@ def SPF(domain, **kwargs):
 
         salt ns1 dns.SPF saltstack.com
     '''
-    # Deprecation warning for the nameserver option
     if 'nameserver' in kwargs:
         salt.utils.versions.warn_until(
             'Natrium',
@@ -318,7 +323,6 @@ def TXT(name, **kwargs):
 
         salt ns1 dns.TXT saltstack.com
     '''
-    # Deprecation warning for the nameserver option
     if 'nameserver' in kwargs:
         salt.utils.versions.warn_until(
             'Natrium',
