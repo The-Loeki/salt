@@ -40,6 +40,11 @@ def check_ip(addr):
         salt ns1 dig.check_ip 127.0.0.1
         salt ns1 dig.check_ip 1111:2222:3333:4444:5555:6666:7777:8888
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module and it\'s check_ip function have been deprecated and will be removed in Salt {version}.'
+        'Please use network.is_ip, utils.net.validate or the Jinja filters instead'
+    )
 
     try:
         addr = addr.rsplit('/', 1)
@@ -84,6 +89,12 @@ def A(host, nameserver=None):
 
         salt ns1 dig.A www.google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     dig = ['dig', '+short', six.text_type(host), 'A']
 
     if nameserver is not None:
@@ -116,6 +127,12 @@ def AAAA(host, nameserver=None):
 
         salt ns1 dig.AAAA www.google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     dig = ['dig', '+short', six.text_type(host), 'AAAA']
 
     if nameserver is not None:
@@ -148,6 +165,12 @@ def NS(domain, resolve=True, nameserver=None):
 
         salt ns1 dig.NS google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     dig = ['dig', '+short', six.text_type(domain), 'NS']
 
     if nameserver is not None:
@@ -188,6 +211,12 @@ def SPF(domain, record='SPF', nameserver=None):
 
         salt ns1 dig.SPF google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     spf_re = re.compile(r'(?:\+|~)?(ip[46]|include):(.+)')
     cmd = ['dig', '+short', six.text_type(domain), record]
 
@@ -246,6 +275,12 @@ def MX(domain, resolve=False, nameserver=None):
 
         salt ns1 dig.MX google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     dig = ['dig', '+short', six.text_type(domain), 'MX']
 
     if nameserver is not None:
@@ -284,6 +319,12 @@ def TXT(host, nameserver=None):
 
         salt ns1 dig.TXT google.com
     '''
+    salt.utils.versions.warn_until(
+        'Natrium',
+        'The dig module has been deprecated and will be removed in Salt {version}.'
+        'Please use the new dns module instead'
+    )
+
     dig = ['dig', '+short', six.text_type(host), 'TXT']
 
     if nameserver is not None:
